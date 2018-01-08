@@ -10,13 +10,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class MainActivity extends AppCompatActivity
+    implements OnMapReadyCallback {
 
     private TextView mTextMessage;
     public static int mainFragmentLayout;
     private FragmentManager fragmentManager;
     private Fragment fragment;
-    private boolean itemFlag;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -25,18 +31,15 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             //Create Fragment View when Item is Clicked
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
+            boolean itemFlag;
             itemFlag = false;
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    fragment = new HomeFragment();
-                    itemFlag = true;
+                    SetHomeFragment();
                     break;
                 case R.id.navigation_map:
-                    mTextMessage.setText(R.string.title_map);
-                    fragment = new MapFragment();
-                    itemFlag = true;
+                    SetMapFragment();
                     break;
                 case R.id.navigation_camera:
                     mTextMessage.setText(R.string.title_camera);
@@ -59,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainFragmentLayout = R.id.container;
         fragmentManager = getSupportFragmentManager();
-
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -82,5 +85,20 @@ public class MainActivity extends AppCompatActivity {
         homeFragmentTx.replace(mainFragmentLayout, homeFragment);
         homeFragmentTx.commit();
     }
+    private void SetMapFragment() {
+        //Create Fragment View when Item is Clicked
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
+        Fragment mapFragment = new MapFragment();
+        FragmentTransaction mapFragmentTx = fragmentManager.beginTransaction();
+        mapFragmentTx.replace(mainFragmentLayout, mapFragment);
+        mapFragmentTx.commit();
+    }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng UCSC = new LatLng(36.9914, -122.0609);
+        googleMap.addMarker(new MarkerOptions().position(UCSC)
+                .title("UCSC"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(UCSC));
+    }
 }
