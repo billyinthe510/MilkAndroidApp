@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity
     private TextView mTextMessage;
     public static int mainFragmentLayout;
     private FragmentManager fragmentManager;
-    private Fragment fragment;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -30,10 +29,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             //Create Fragment View when Item is Clicked
-            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
-            boolean itemFlag;
-            itemFlag = false;
-
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     SetHomeFragment();
@@ -43,22 +38,14 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case R.id.navigation_camera:
                     mTextMessage.setText(R.string.title_camera);
-                    fragment = new CameraFragment();
-                    itemFlag = true;
+                    SetCameraFragment();
                     break;
                 case R.id.navigation_profile:
                     mTextMessage.setText(R.string.title_profile);
-                    fragment = new ProfileFragment();
-                    itemFlag = true;
+                    SetProfileFragment();
                     break;
             }
-            if(itemFlag)
-            {
-                FragmentTransaction fragmentTx = fragmentManager.beginTransaction();
-                fragmentTx.replace(mainFragmentLayout, fragment);
-                fragmentTx.commit();
-            }
-            return itemFlag;
+            return true;
         }
     };
 
@@ -92,6 +79,22 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction mapFragmentTx = fragmentManager.beginTransaction();
         mapFragmentTx.replace(mainFragmentLayout, mapFragment);
         mapFragmentTx.commit();
+    }
+    private void SetCameraFragment() {
+        //Create Fragment View when Item is Clicked
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
+        Fragment cameraFragment = new CameraFragment();
+        FragmentTransaction cameraFragmentTx = fragmentManager.beginTransaction();
+        cameraFragmentTx.replace(mainFragmentLayout, cameraFragment);
+        cameraFragmentTx.commit();
+    }
+    private void SetProfileFragment() {
+        //Create Fragment View when Item is Clicked
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
+        Fragment profileFragment = new ProfileFragment();
+        FragmentTransaction profileFragmentTx = fragmentManager.beginTransaction();
+        profileFragmentTx.replace(mainFragmentLayout, profileFragment);
+        profileFragmentTx.commit();
     }
 
     @Override
