@@ -8,21 +8,22 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity
     implements OnMapReadyCallback {
 
-    private TextView mTextMessage;
     public static int mainFragmentLayout;
     private FragmentManager fragmentManager;
 
+    //region BottomNavigation OnNavigationItemSelectedListener
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -31,24 +32,22 @@ public class MainActivity extends AppCompatActivity
             //Create Fragment View when Item is Clicked
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    SetHomeFragment();
+                    SetFragment(new HomeFragment());
                     break;
                 case R.id.navigation_map:
-                    SetMapFragment();
+                    setMap();
                     break;
                 case R.id.navigation_camera:
-                    mTextMessage.setText(R.string.title_camera);
-                    SetCameraFragment();
+                    SetFragment(new CameraFragment());
                     break;
                 case R.id.navigation_profile:
-                    mTextMessage.setText(R.string.title_profile);
-                    SetProfileFragment();
+                    SetFragment(new ProfileFragment());
                     break;
             }
             return true;
         }
     };
-
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,45 +55,41 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         mainFragmentLayout = R.id.container;
         fragmentManager = getSupportFragmentManager();
-        mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         // SET THE DEFAULT FRAGMENT
-        SetHomeFragment();
+        SetFragment(new HomeFragment());
     }
 
-    private void SetHomeFragment() {
+    //region SetFragment
+    private void SetFragment(Fragment fragment)
+    {
         //Create Fragment View when Item is Clicked
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
-        Fragment homeFragment = new HomeFragment();
-        FragmentTransaction homeFragmentTx = fragmentManager.beginTransaction();
-        homeFragmentTx.replace(mainFragmentLayout, homeFragment);
-        homeFragmentTx.commit();
+        FragmentTransaction fragmentTx = fragmentManager.beginTransaction();
+        fragmentTx.replace(mainFragmentLayout, fragment);
+        fragmentTx.commit();
     }
-    private void SetMapFragment() {
-        //Create Fragment View when Item is Clicked
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
-        Fragment mapFragment = new MapFragment();
-        FragmentTransaction mapFragmentTx = fragmentManager.beginTransaction();
-        mapFragmentTx.replace(mainFragmentLayout, mapFragment);
-        mapFragmentTx.commit();
-    }
-    private void SetCameraFragment() {
-        //Create Fragment View when Item is Clicked
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
-        Fragment cameraFragment = new CameraFragment();
-        FragmentTransaction cameraFragmentTx = fragmentManager.beginTransaction();
-        cameraFragmentTx.replace(mainFragmentLayout, cameraFragment);
-        cameraFragmentTx.commit();
-    }
-    private void SetProfileFragment() {
-        //Create Fragment View when Item is Clicked
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);  //clear backStack
-        Fragment profileFragment = new ProfileFragment();
-        FragmentTransaction profileFragmentTx = fragmentManager.beginTransaction();
-        profileFragmentTx.replace(mainFragmentLayout, profileFragment);
-        profileFragmentTx.commit();
+    //endregion
+
+    private void setMap()
+    {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        if (mapFragment == null)
+        {
+            int mapType = getResources().getInteger(R.integer.NORMAL);
+            GoogleMapOptions mapOptions = new GoogleMapOptions()
+                    .mapType(mapType)
+                    .zoomControlsEnabled(true)
+                    .compassEnabled(true);
+            FragmentTransaction fragmentTx = fragmentManager.beginTransaction();
+            mapFragment = SupportMapFragment.newInstance(mapOptions);
+            fragmentTx.replace(mainFragmentLayout, mapFragment);
+            fragmentTx.commit();
+        }
+        mapFragment.getMapAsync(this);
     }
 
     @Override
