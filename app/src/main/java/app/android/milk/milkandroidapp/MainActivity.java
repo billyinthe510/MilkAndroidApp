@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity
                     SetFragment(new HomeFragment());
                     break;
                 case R.id.navigation_map:
-                    setMap();
+                    SetMapFragment();
                     break;
                 case R.id.navigation_camera:
                     SetFragment(new CameraFragment());
@@ -72,17 +72,16 @@ public class MainActivity extends AppCompatActivity
         fragmentTx.commit();
     }
     //endregion
-
-    private void setMap()
+    //region SetMapFragment
+    private void SetMapFragment()
     {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment == null)
         {
-            int mapType = getResources().getInteger(R.integer.NORMAL);
             GoogleMapOptions mapOptions = new GoogleMapOptions()
-                    .mapType(mapType)
-                    .zoomControlsEnabled(true)
+                    .mapType(GoogleMap.MAP_TYPE_NORMAL)
+                    .zoomControlsEnabled(false)
                     .compassEnabled(true);
             FragmentTransaction fragmentTx = fragmentManager.beginTransaction();
             mapFragment = SupportMapFragment.newInstance(mapOptions);
@@ -91,6 +90,7 @@ public class MainActivity extends AppCompatActivity
         }
         mapFragment.getMapAsync(this);
     }
+    //endregion
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
