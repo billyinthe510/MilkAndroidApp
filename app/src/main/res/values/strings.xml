@@ -2,7 +2,7 @@
     <string name="app_name">MilkAndroidApp</string>
     <string name="google_maps_key">AIzaSyCoXerk9TxGYJL_xXNXvAvponk3OAPSZ8w</string>
 
-    <string name="ok">POSITIVE (+)</string>
+    <string name="ok">OK</string>
     <string name="cancel">NEGATIVE (-)</string>
 
     <string name="title_home">Home</string>

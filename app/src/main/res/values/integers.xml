@@ -4,4 +4,5 @@
     <integer name="SATELLITE">2</integer>
     <integer name="TERRAIN">3</integer>
     <integer name="HYBRID">4</integer>
+
 </resources>
