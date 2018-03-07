@@ -1,11 +1,15 @@
 package app.android.milk.milkandroidapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -72,6 +76,7 @@ public class MainActivity extends AppCompatActivity
         fragmentTx.commit();
     }
     //endregion
+
     //region SetMapFragment
     private void SetMapFragment()
     {
@@ -94,9 +99,31 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+        } else {
+            // Show rationale and request permission.
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            // Add the buttons
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User clicked OK button
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+            // Set other dialog properties
+            // Create the AlertDialog
+            AlertDialog dialog = builder.create();
+        }
         LatLng UCSC = new LatLng(36.9914, -122.0609);
         googleMap.addMarker(new MarkerOptions().position(UCSC)
                 .title("UCSC"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(UCSC));
+
     }
 }
