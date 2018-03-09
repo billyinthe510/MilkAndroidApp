@@ -15,13 +15,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
     implements OnMapReadyCallback {
@@ -30,6 +37,7 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager fragmentManager;
     public GoogleMap gMap;
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private List<Marker> markers;
 
     //region BottomNavigation OnNavigationItemSelectedListener
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -65,6 +73,7 @@ public class MainActivity extends AppCompatActivity
         fragmentManager = getSupportFragmentManager();
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        markers = new LinkedList<Marker>();
 
         // SET THE DEFAULT FRAGMENT
         SetFragment(new HomeFragment());
@@ -114,10 +123,37 @@ public class MainActivity extends AppCompatActivity
             // Request Location Permission
             RequestLocationPermission();
         }
-        LatLng UCSC = new LatLng(36.9914, -122.0609);
-        googleMap.addMarker(new MarkerOptions().position(UCSC)
-                .title("UCSC"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(UCSC));
+
+        if(googleMap != null) {
+            LatLng position = new LatLng(34.0689, -118.4452);
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title("UCLA")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            markers.add(marker);
+            position = new LatLng(37.7219, -122.4782);
+            marker = googleMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title("SFSU")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            markers.add(marker);
+            position = new LatLng(36.9914, -122.0609);
+            marker = googleMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title("UCSC")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            markers.add(marker);
+
+            // hardcoded initial position: needs future work
+            CameraPosition.Builder builder = CameraPosition.builder();
+            builder.target(position);
+            builder.zoom(6);
+            builder.bearing(0);
+            builder.tilt(15);
+            CameraPosition cameraPosition = builder.build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            googleMap.moveCamera(cameraUpdate);
+        }
 
     }
     //region RequestLocationPermission
