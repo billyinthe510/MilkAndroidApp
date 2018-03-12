@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity
     public GoogleMap gMap;
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private List<Marker> markers;
+    private List<MarkerInfo> info;
 
     //region BottomNavigation OnNavigationItemSelectedListener
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -73,7 +74,12 @@ public class MainActivity extends AppCompatActivity
         fragmentManager = getSupportFragmentManager();
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
         markers = new LinkedList<Marker>();
+        info = new LinkedList<MarkerInfo>();
+        info.add(new MarkerInfo("UCSC",36.9914, -122.0609 ));
+        info.add(new MarkerInfo("SFSU",37.7219, -122.4782 ));
+        info.add(new MarkerInfo("UCLA",34.0689, -118.4452 ));
 
         // SET THE DEFAULT FRAGMENT
         SetFragment(new HomeFragment());
@@ -125,25 +131,24 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(googleMap != null) {
-            LatLng position = new LatLng(34.0689, -118.4452);
-            Marker marker = googleMap.addMarker(new MarkerOptions()
-                    .position(position)
-                    .title("UCLA")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-            markers.add(marker);
-            position = new LatLng(37.7219, -122.4782);
-            marker = googleMap.addMarker(new MarkerOptions()
-                    .position(position)
-                    .title("SFSU")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-            markers.add(marker);
-            position = new LatLng(36.9914, -122.0609);
-            marker = googleMap.addMarker(new MarkerOptions()
-                    .position(position)
-                    .title("UCSC")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-            markers.add(marker);
+            Marker marker;
+            LatLng position;
+            MarkerInfo currentMarker;
+            int nMarkers = info.size();
+            for(int i=0; i<nMarkers; i++)
+            {
+                currentMarker = info.get(i);
+                position = new LatLng(currentMarker.getLatitude(), currentMarker.getLongitude());
+                marker = googleMap.addMarker(
+                        new MarkerOptions()
+                        .title(currentMarker.getTitle())
+                        .position(position)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                markers.add(marker);
+            }
 
+            // currently hardcoded viewpoint set to UCSC
+            position = new LatLng(36.9914, -122.0609);
             // hardcoded initial position: needs future work
             CameraPosition.Builder builder = CameraPosition.builder();
             builder.target(position);
@@ -154,8 +159,8 @@ public class MainActivity extends AppCompatActivity
             CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
             googleMap.moveCamera(cameraUpdate);
         }
-
     }
+
     //region RequestLocationPermission
     public void RequestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
