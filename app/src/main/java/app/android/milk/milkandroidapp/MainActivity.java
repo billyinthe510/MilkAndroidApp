@@ -3,6 +3,7 @@ package app.android.milk.milkandroidapp;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
     implements OnMapReadyCallback {
 
+    private static final String TAG = "MilkAndroidApp";
     public static int mainFragmentLayout;
     private FragmentManager fragmentManager;
     public GoogleMap gMap;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case R.id.navigation_camera:
                     SetFragment(new CameraFragment());
+                    SetCameraFragment();
                     break;
                 case R.id.navigation_profile:
                     SetFragment(new ProfileFragment());
@@ -165,7 +169,7 @@ public class MainActivity extends AppCompatActivity
     public void RequestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-            showExplanation("Permission Needed", "Rationale", android.Manifest.permission.ACCESS_FINE_LOCATION, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            showExplanation("Permission Needed", "To Locate Your Device", android.Manifest.permission.ACCESS_FINE_LOCATION, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else {
             requestPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
@@ -226,12 +230,38 @@ public class MainActivity extends AppCompatActivity
     //region SetCameraFragment
     private void SetCameraFragment()
     {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            // your code using Camera API here - is between 1-20
-        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // your code using Camera2 API here - is api 21 or higher
+        if(hasCameraSupport()) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                // your code using Camera API here - is between 1-20
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // your code using Camera2 API here - is api 21 or higher
+            }
+        }
+        else {
+            // Device does not have camera support
         }
 
+    }
+    //endregion
+    //region hasCameraSupport
+    private boolean hasCameraSupport()
+    {
+        boolean hasCamera = false;
+        int numberOfCameras = Camera.getNumberOfCameras();
+        PackageManager pm = this.getPackageManager();
+        final boolean deviceHasCameraFlag = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
+
+        if( !deviceHasCameraFlag || numberOfCameras==0 )
+        {
+            Log.e(TAG, "Device has no camera" + numberOfCameras);
+            Toast.makeText(getApplicationContext(), "Device has no camera",      Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Log.e(TAG, "Device has camera: " + deviceHasCameraFlag + " (" + numberOfCameras + ")" );
+            hasCamera = true;
+        }
+        return hasCamera;
     }
     //endregion
 
