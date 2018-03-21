@@ -3,6 +3,7 @@ package app.android.milk.milkandroidapp;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -40,6 +41,25 @@ public class MainActivity extends AppCompatActivity
     private List<Marker> markers;
     private List<MarkerInfo> info;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mainFragmentLayout = R.id.container;
+        fragmentManager = getSupportFragmentManager();
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        markers = new LinkedList<Marker>();
+        info = new LinkedList<MarkerInfo>();
+        info.add(new MarkerInfo("UCSC",36.9914, -122.0609 ));
+        info.add(new MarkerInfo("SFSU",37.7219, -122.4782 ));
+        info.add(new MarkerInfo("UCLA",34.0689, -118.4452 ));
+
+        // SET THE DEFAULT FRAGMENT
+        SetFragment(new HomeFragment());
+    }
+
     //region BottomNavigation OnNavigationItemSelectedListener
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -65,26 +85,6 @@ public class MainActivity extends AppCompatActivity
         }
     };
     //endregion
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mainFragmentLayout = R.id.container;
-        fragmentManager = getSupportFragmentManager();
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        markers = new LinkedList<Marker>();
-        info = new LinkedList<MarkerInfo>();
-        info.add(new MarkerInfo("UCSC",36.9914, -122.0609 ));
-        info.add(new MarkerInfo("SFSU",37.7219, -122.4782 ));
-        info.add(new MarkerInfo("UCLA",34.0689, -118.4452 ));
-
-        // SET THE DEFAULT FRAGMENT
-        SetFragment(new HomeFragment());
-    }
-
     //region SetFragment
     private void SetFragment(Fragment fragment)
     {
@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity
         }
         mapFragment.getMapAsync(this);
     }
-    //endregion
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -160,7 +159,8 @@ public class MainActivity extends AppCompatActivity
             googleMap.moveCamera(cameraUpdate);
         }
     }
-
+    //endregion
+    //region Location Services Permission Section
     //region RequestLocationPermission
     public void RequestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -219,6 +219,19 @@ public class MainActivity extends AppCompatActivity
             // permissions this app might request.
             default:
         }
+    }
+    //endregion
+    //endregion
+
+    //region SetCameraFragment
+    private void SetCameraFragment()
+    {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // your code using Camera API here - is between 1-20
+        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // your code using Camera2 API here - is api 21 or higher
+        }
+
     }
     //endregion
 
